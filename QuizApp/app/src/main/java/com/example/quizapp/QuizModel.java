@@ -1,19 +1,33 @@
 package com.example.quizapp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class QuizModel {
     private String id;
     private String title;
     private String subTitle;
     private String time;
 
+    private ArrayList<QuestionModel> questionList;
+
     public QuizModel() {
     }
 
-    public QuizModel(String id, String title, String subTitle, String time) {
+    public QuizModel(String id, String title, String subTitle, String time, ArrayList<QuestionModel> questionList) {
         this.id = id;
         this.title = title;
         this.subTitle = subTitle;
         this.time = time;
+        this.questionList = questionList;
+    }
+
+    public ArrayList<QuestionModel> getQuestionList() {
+        return questionList;
+    }
+
+    public void setQuestionList(ArrayList<QuestionModel> questionList) {
+        this.questionList = questionList;
     }
 
     public String getId() {

@@ -4,6 +4,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +15,10 @@ import androidx.annotation.NonNull;
 
 public class QuizListAdapter extends RecyclerView.Adapter<QuizListAdapter.MyViewHolder> {
     private List<QuizModel> quizList;
-
-    public QuizListAdapter(List<QuizModel> quizList) {
+    private Context context;
+    public QuizListAdapter(List<QuizModel> quizList, Context context) {
         this.quizList = quizList;
+        this.context = context;
     }
 
     @NonNull
@@ -32,7 +35,15 @@ public class QuizListAdapter extends RecyclerView.Adapter<QuizListAdapter.MyView
         holder.titleTextView.setText(quiz.getTitle());
         holder.subTitleTextView.setText(quiz.getSubTitle());
         holder.timeTextView.setText(quiz.getTime() + " min");
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, QuizActivity.class);
+            QuizActivity.questionModelList = quiz.getQuestionList();
+            QuizActivity.time = quiz.getTime();
+            context.startActivity(intent);
+        });
     }
+
+
 
     @Override
     public int getItemCount() {
