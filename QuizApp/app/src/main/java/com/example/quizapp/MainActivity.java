@@ -1,6 +1,8 @@
 package com.example.quizapp;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +12,9 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private QuizListAdapter quizListAdapter;
     private List<QuizModel> quizModelList = new ArrayList<>();
+
+    private ProgressBar progressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,26 +43,33 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void SetUpRecyclerView(){
+        progressBar.setVisibility(View.GONE);
         quizListAdapter = new QuizListAdapter(quizModelList, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(quizListAdapter);
     }
     private void GetDataFromFirebase(){
 
-        ArrayList<QuestionModel> listQuestionModel = new ArrayList<>();
-        listQuestionModel.add(new QuestionModel("What is android?", new ArrayList<>(Arrays.asList("OS", "Language", "Product" ,"None")), "OS"));
-        listQuestionModel.add(new QuestionModel("Who owns android?", new ArrayList<>(Arrays.asList("Apple", "Google", "Microsoft","Samsung")), "Google"));
-        listQuestionModel.add(new QuestionModel("Which assistant android uses?", new ArrayList<>(Arrays.asList("Siri", "Cortana", "Google Assistant","Alexa")), "Google Assistant"));
-
-
-        quizModelList.add(new QuizModel("1", "Programming", "All the basic programming", "10", listQuestionModel));
-//        quizModelList.add(new QuizModel("2", "Computer", "All the computer question", "20"));
-//        quizModelList.add(new QuizModel("3", "Geography", "Boost your geographic knowledge", "15"));
-        SetUpRecyclerView();
+//        ArrayList<QuestionModel> listQuestionModel = new ArrayList<>();
+//        listQuestionModel.add(new QuestionModel("What is android?", new ArrayList<>(Arrays.asList("OS", "Language", "Product" ,"None")), "OS"));
+//        listQuestionModel.add(new QuestionModel("Who owns android?", new ArrayList<>(Arrays.asList("Apple", "Google", "Microsoft","Samsung")), "Google"));
+//        listQuestionModel.add(new QuestionModel("Which assistant android uses?", new ArrayList<>(Arrays.asList("Siri", "Cortana", "Google Assistant","Alexa")), "Google Assistant"));
+//        quizModelList.add(new QuizModel("1", "Programming", "All the basic programming", "10", listQuestionModel));
+        progressBar.setVisibility(View.VISIBLE);
+        FirebaseDatabase.getInstance().getReference().get().addOnSuccessListener(dataSnapshot -> {
+            if(dataSnapshot.exists()){
+                for (DataSnapshot childSnapshot :dataSnapshot.getChildren()) {
+                    QuizModel quizModel = childSnapshot.getValue(QuizModel.class);
+                    quizModelList.add(quizModel);
+                }
+            }
+            SetUpRecyclerView();
+        });
     }
 
     private void BindingView() {
         recyclerView = findViewById(R.id.recycler_view);
+        progressBar= findViewById(R.id.progress_bar);
     }
 
     private void BindingAction() {

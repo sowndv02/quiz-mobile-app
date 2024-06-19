@@ -11,7 +11,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="10dp">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -49,6 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="8dp"
+        android:layout_marginHorizontal="8dp"
         tools:progress="40"
         android:id="@+id/quiz_question_progress_indicator"/>
 
@@ -70,7 +72,7 @@
                 android:text="What is android OS?"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:padding="8dp"
+                android:padding="16dp"
                 android:background="@drawable/rounded_corner"
                 android:backgroundTint="@color/blue"
                 android:textColor="@color/white"

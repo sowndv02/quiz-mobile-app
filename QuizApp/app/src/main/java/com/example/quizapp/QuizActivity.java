@@ -1,17 +1,22 @@
 package com.example.quizapp;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.viewbinding.ViewBinding;
 
+import com.example.quizapp.databinding.ScoreDialogBinding;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import org.w3c.dom.Text;
@@ -31,6 +36,10 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     private Button btn3;
     private Button nextBtn;
     private int currentQuestionIndex = 0;
+
+    private String selectedAnswer = "";
+    private int score = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,8 +76,14 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void LoadQuestions(){
-        questionIndicatorTextView.setText("Question " + currentQuestionIndex + 1 + "/" + questionModelList.size());
-        questionProgressIndicator.setProgress((int)(float)currentQuestionIndex / questionModelList.size() * 100);
+        selectedAnswer = "";
+        if(currentQuestionIndex == questionModelList.size()){
+            FinishQuiz();
+            return;
+        }
+
+        questionIndicatorTextView.setText("Question " + (currentQuestionIndex + 1) + "/" + questionModelList.size());
+        questionProgressIndicator.setProgress((int)((float)currentQuestionIndex / questionModelList.size() * 100));
         questionTextView.setText(questionModelList.get(currentQuestionIndex).getQuestion());
         btn0.setText(questionModelList.get(currentQuestionIndex).getOptions().get(0));
         btn1.setText(questionModelList.get(currentQuestionIndex).getOptions().get(1));
@@ -98,6 +113,49 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        btn0.setBackgroundColor(getColor(R.color.gray));
+        btn1.setBackgroundColor(getColor(R.color.gray));
+        btn2.setBackgroundColor(getColor(R.color.gray));
+        btn3.setBackgroundColor(getColor(R.color.gray));
+        Button btnClicked = (Button)v;
+        if(btnClicked.getId() == R.id.next_btn){
+            if(selectedAnswer.isEmpty()){
+                Toast.makeText(this, "Please answer to continue", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if(selectedAnswer == questionModelList.get(currentQuestionIndex).getCorrect()){
+                score ++;
 
+            }
+            currentQuestionIndex++;
+            LoadQuestions();
+        }else{
+            selectedAnswer = btnClicked.getText().toString();
+            btnClicked.setBackgroundColor(getColor(R.color.orange));
+        }
+    }
+
+    private void FinishQuiz(){
+        int totalQuestion = questionModelList.size();
+        int percentage = (int)((float)score/(float)totalQuestion * 100);
+
+        ScoreDialogBinding  dialogBinding =  ScoreDialogBinding.inflate(getLayoutInflater());
+
+        dialogBinding.scoreProgressText.setText(percentage + " %");
+        dialogBinding.scoreProgressIndicator.setProgress(percentage);
+        if(percentage > 60){
+            dialogBinding.scoreTitle.setText("Congrats! You have passed");
+            dialogBinding.scoreTitle.setTextColor(Color.BLUE);
+        }else{
+            dialogBinding.scoreTitle.setText("Oops! You have failed");
+            dialogBinding.scoreTitle.setTextColor(Color.RED);
+        }
+        dialogBinding.scoreSubtitle.setText(score + " out of " + totalQuestion + " are correct");
+        dialogBinding.finishBtn.setOnClickListener(v -> finish());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogBinding.getRoot())
+                .setCancelable(false);
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }
